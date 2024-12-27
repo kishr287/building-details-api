@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Details API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+    <script>
+        async function fetchBuildingDetails() {
+            const refNo = document.getElementById("refNo").value;
+            const url = `https://erp.chennaicorporation.gov.in/pgr/external/mobileservice?serviceId=common_api&jsonResp=Yes&subService=MetroGetBuilding&refNo=${refNo}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                const data = await response.json();
+                displayTable(data);
+            } catch (error) {
+                document.getElementById("result").innerHTML = `<p style="color: red;">${error.message}</p>`;
+            }
+        }
+
+        function displayTable(data) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "";
+            
+            if (data && typeof data === "object") {
+                const table = document.createElement("table");
+
+                // Create table headers
+                const headerRow = document.createElement("tr");
+                for (const key in data) {
+                    const th = document.createElement("th");
+                    th.textContent = key;
+                    headerRow.appendChild(th);
+                }
+                table.appendChild(headerRow);
+
+                // Create table data row
+                const dataRow = document.createElement("tr");
+                for (const key in data) {
+                    const td = document.createElement("td");
+                    td.textContent = data[key];
+                    dataRow.appendChild(td);
+                }
+                table.appendChild(dataRow);
+
+                resultDiv.appendChild(table);
+            } else {
+                resultDiv.innerHTML = "<p>No data available</p>";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Building Details Fetcher</h1>
+    <label for="refNo">Enter Reference Number:</label>
+    <input type="text" id="refNo" placeholder="e.g., PPA/WDCN11/10024/2022">
+    <button onclick="fetchBuildingDetails()">Get Building Details</button>
+
+    <div id="result"></div>
+</body>
+</html>
